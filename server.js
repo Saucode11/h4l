@@ -7,34 +7,32 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "https://h4l.netlify.app", // your Netlify domain
-      "http://localhost:5173"    // optional for local testing
+      "https://h4l.netlify.app", // your Netlify site
+      "http://localhost:5173"    // for local development (optional)
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
 
-// ✅ Parse JSON
+// ✅ Parse JSON request bodies
 app.use(express.json());
 
-// ✅ Health check route
+// ✅ Basic test route
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", message: "Backend connected successfully!" });
 });
 
-// ✅ Example API route
+// ✅ Example route
 app.get("/api/message", (req, res) => {
-  res.json({ message: "Hello from Render backend!" });
+  res.json({ message: "Hello from your Render backend!" });
 });
 
-// ✅ Catch-all route (no frontend here)
+// ✅ Fallback for unmatched routes
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
 
-// ✅ Start the server
+// ✅ Start server
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
