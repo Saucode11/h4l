@@ -1,37 +1,44 @@
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
+import express from "express";
+import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
 
-// ✅ Allow Netlify frontend to access this backend
-app.use(cors({
-  origin: [
-    'https://your-netlify-site.netlify.app', // 🔁 replace with your real Netlify site URL
-    'http://localhost:5173' // optional: for local development (Vite default)
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+// ✅ Enable CORS for Netlify frontend and localhost (dev)
+app.use(
+  cors({
+    origin: [
+      "https://h4l.netlify.app", // your deployed frontend
+      "http://localhost:5173"    // optional for local testing
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 
-// Middleware to parse JSON if your app needs it
+// ✅ Parse incoming JSON data
 app.use(express.json());
 
-// ✅ Serve static frontend files if needed
-app.use(express.static(path.join(__dirname, 'public')));
+// ✅ Define __dirname (for ES Modules)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// ✅ Example route
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok' });
+// ✅ Serve static files (optional)
+app.use(express.static(path.join(__dirname, "public")));
+
+// ✅ Example route to confirm backend works
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", message: "Backend is connected successfully!" });
 });
 
-// ✅ Fallback route for frontend
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// ✅ Catch-all route
+app.use((req, res) => {
+  res.status(404).json({ error: "Route not found" });
 });
 
-// ✅ Start the server
+// ✅ Start server
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
+  console.log(`✅ Server started on port ${PORT}`);
 });
